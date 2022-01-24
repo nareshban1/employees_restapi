@@ -1,7 +1,7 @@
 import { useEffect, useReducer } from 'react';
 
-export const useApi = (url) => {
-    var baseurl = process.env.REACT_APP_TRAINING_URL + url;
+export const useApi = (uri, method, body, headers) => {
+    var apiURL = process.env.REACT_APP_TRAINING_URL + decodeURI;
 
     const initialState = {
         status: 'idle',
@@ -26,13 +26,12 @@ export const useApi = (url) => {
 
     useEffect(() => {
         let cancelRequest = false;
-        if (!baseurl) return;
+        if (!apiURL) return;
 
         const fetchData = async () => {
-            console.log(baseurl)
             dispatch({ type: 'FETCHING' });
             try {
-                const response = await fetch(baseurl);
+                const response = await fetch(apiURL, { method: method, body: body, headers: headers });
                 const data = await response.json();
                 if (cancelRequest) return;
                 dispatch({ type: 'FETCHED', payload: data });
@@ -47,7 +46,7 @@ export const useApi = (url) => {
         return function cleanup() {
             cancelRequest = true;
         };
-    }, [baseurl]);
+    }, [apiURL, method, body, headers]);
 
     return state;
 };
